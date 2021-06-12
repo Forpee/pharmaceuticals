@@ -1,82 +1,177 @@
-import Head from 'next/head'
-
+import { useEffect, useState, useRef } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+gsap.registerPlugin(ScrollTrigger);
 export default function Home() {
+  const canvas = useRef(null);
+  const endRef = useRef(null);
+  const stopRef = useRef(null);
+
+  useEffect(() => {
+    canvas.current.width = 1000;
+    canvas.current.height = 1000;
+    const frameCount = 1200;
+    const currentFrame = (index) =>
+      `/sequence/webp/A_${index.toString().padStart(5, "0")}.webp`;
+    const images = [];
+    const boosts = {
+      frame: 0,
+    };
+    for (let i = 0; i < frameCount; i++) {
+      const img = new Image();
+      if (i >= 300 && i < 600) {
+        img.src = currentFrame(i - 300);
+      } else if (i >= 600 && i < 900) {
+        img.src = currentFrame(i - 600);
+      } else if (i >= 900 && i < 1200) {
+        img.src = currentFrame(i - 900);
+      } else if (i >= 1200 && i < 1500) {
+        img.src = currentFrame(i - 1200);
+      } else if (i >= 1500 && i < 1800) {
+        img.src = currentFrame(i - 1500);
+      } else {
+        img.src = currentFrame(i);
+      }
+
+      images.push(img);
+    }
+
+    gsap.to(boosts, {
+      frame: frameCount - 1,
+      snap: "frame",
+      scrollTrigger: {
+        scrub: true,
+      },
+      onUpdate: render, // use animation onUpdate instead of scrollTrigger's onUpdate
+    });
+
+    const ctx = canvas.current.getContext("2d");
+
+    var overlay = new Image();
+    overlay.src = "/sequence/alpha.png";
+    overlay.onload = render;
+
+    images[0].onload = render;
+    function render() {
+      ctx.save();
+      ctx.drawImage(images[boosts.frame], 0, 0);
+      ctx.globalCompositeOperation = "destination-out";
+      ctx.drawImage(overlay, 0, 0);
+      ctx.restore();
+    }
+    gsap.to(canvas.current, {
+      xPercent: -100,
+      ease: "none",
+      scrollTrigger: {
+        scrub: true,
+        endTrigger: endRef.current,
+      },
+    });
+  }, [canvas]);
+
+  useEffect(() => {
+    gsap.from(".line-2", {
+      scrollTrigger: {
+        trigger: ".elderberry",
+        scrub: true,
+        anticipatePin: true,
+        pin: true,
+        start: "top top",
+        end: "+=100%",
+      },
+    });
+
+    gsap.from(".line-3", {
+      scrollTrigger: {
+        trigger: ".vitamin",
+        scrub: true,
+        anticipatePin: true,
+        pin: true,
+        start: "top top",
+        end: "+=100%",
+      },
+    });
+    gsap.from(".line-4", {
+      scrollTrigger: {
+        trigger: ".zinc",
+        scrub: true,
+        anticipatePin: true,
+        pin: true,
+        start: "top top",
+        end: "+=100%",
+      },
+    });
+  });
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-2">
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <main className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center">
-        <h1 className="text-6xl font-bold">
-          Welcome to{' '}
-          <a className="text-blue-600" href="https://nextjs.org">
-            Next.js!
-          </a>
-        </h1>
-
-        <p className="mt-3 text-2xl">
-          Get started by editing{' '}
-          <code className="p-3 font-mono text-lg bg-gray-100 rounded-md">
-            pages/index.js
-          </code>
-        </p>
-
-        <div className="flex flex-wrap items-center justify-around max-w-4xl mt-6 sm:w-full">
-          <a
-            href="https://nextjs.org/docs"
-            className="p-6 mt-6 text-left border w-96 rounded-xl hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Documentation &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Find in-depth information about Next.js features and API.
-            </p>
-          </a>
-
-          <a
-            href="https://nextjs.org/learn"
-            className="p-6 mt-6 text-left border w-96 rounded-xl hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Learn &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Learn about Next.js in an interactive course with quizzes!
-            </p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className="p-6 mt-6 text-left border w-96 rounded-xl hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Examples &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Discover and deploy boilerplate example Next.js projects.
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className="p-6 mt-6 text-left border w-96 rounded-xl hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Deploy &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
+    <div className="bg-gradient">
+      <div className="h-screen">
+        <div className="flex">
+          <div className="fixed bottle z-50">
+            <canvas className="custom-canvas" ref={canvas}></canvas>
+          </div>
         </div>
-      </main>
+      </div>
+      <div className="h-screen">
+        <h2 className="h-8" ref={endRef}>
+          Hello
+        </h2>
+        <div className="vl z-10"></div>
+      </div>
+      <div className="h-screen">
+        <div className="vl z-10"></div>
+      </div>
+      <div className="h-screen">
+        <h1>Hello</h1>
+      </div>
+      <div className="h-screen">
+        <h1>Hello</h1>
+      </div>
+      <div className="h-screen">
+        <h1>Hello</h1>
+      </div>
+      <div className="h-screen flex elderberry ">
+        <p className="m-auto">
+          <span className="line line-2"></span>This orange panel gets pinned
+          when its top edge hits the top of the viewport, then the line's
+          animation is linked with the scroll position until it has traveled
+          100% of the viewport's height (<code>end: "+=100%"</code>), then the
+          orange panel is unpinned and normal scrolling resumes. Padding is
+          added automatically to push the rest of the content down so that it
+          catches up with the scroll when it unpins. You can set{" "}
+          <code>pinSpacing: false</code> to prevent that if you prefer.
+        </p>
+      </div>
+      <div className="h-screen flex vitamin ">
+        <p className="m-auto">
+          <span className="line line-3"></span>This orange panel gets pinned
+          when its top edge hits the top of the viewport, then the line's
+          animation is linked with the scroll position until it has traveled
+          100% of the viewport's height (<code>end: "+=100%"</code>), then the
+          orange panel is unpinned and normal scrolling resumes. Padding is
+          added automatically to push the rest of the content down so that it
+          catches up with the scroll when it unpins. You can set{" "}
+          <code>pinSpacing: false</code> to prevent that if you prefer.
+        </p>
+      </div>
+      <div className="h-screen flex zinc ">
+        <p className="m-auto">
+          <span className="line line-4"></span>This orange panel gets pinned
+          when its top edge hits the top of the viewport, then the line's
+          animation is linked with the scroll position until it has traveled
+          100% of the viewport's height (<code>end: "+=100%"</code>), then the
+          orange panel is unpinned and normal scrolling resumes. Padding is
+          added automatically to push the rest of the content down so that it
+          catches up with the scroll when it unpins. You can set{" "}
+          <code>pinSpacing: false</code> to prevent that if you prefer.
+        </p>
+      </div>
 
-      <footer className="flex items-center justify-center w-full h-24 border-t">
-        <a
-          className="flex items-center justify-center"
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className="h-4 ml-2" />
-        </a>
-      </footer>
+     
+      <div ref={stopRef} className="h-screen ">
+        <h1>Hello</h1>
+      </div>
+
+      <footer>Get boosted</footer>
     </div>
-  )
+  );
 }

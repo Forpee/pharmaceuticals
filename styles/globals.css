@@ -1,0 +1,29 @@
+html {
+  --bg-color: #fdc830;
+  --bg-color-two: #f37335;
+}
+.bg-gradient {
+  background: #fdc830;
+  background: -webkit-linear-gradient(
+    to right,
+    var(--bg-color),
+    var(--bg-color-two)
+  );
+  background: linear-gradient(to right, var(--bg-color), var(--bg-color-two));
+}
+
+canvas {
+  width: 90%;
+  height: 80vh;
+}
+
+.bottle {
+  left: 50%;
+  top: 50%;
+  transform: translate(50%, -50%);
+}
+
+.custom-canvas {
+    width: 44rem;
+    height: 80vh;
+}
